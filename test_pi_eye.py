@@ -2,7 +2,7 @@ import unittest
 import pi_eye
 
 
-class MyTestCase(unittest.TestCase):
+class PiEyeTests(unittest.TestCase):
 
     # available classes ['Blekitne suzuki', 'bialy bus', 'chrupek', 'czarne suzuki', 'czerwona mazda', 'srebrny golf']
     CLASS_CHRUPEK = 'chrupek'
