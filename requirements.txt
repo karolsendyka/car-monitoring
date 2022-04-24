@@ -1,5 +1,7 @@
 matplotlib==3.4.3
 numpy==1.21.4
 tensorflow-cpu==2.8.0
-Flask
+Flask~=2.0.3
 gunicorn
+
+Werkzeug~=2.0.2
