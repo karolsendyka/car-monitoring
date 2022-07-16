@@ -1,8 +1,12 @@
 from flask import Flask, render_template, request
 from werkzeug.utils import secure_filename
+import os
 
+# Fails because path is bad ;/
+import pi_eye
 app = Flask(__name__)
-
+UPLOAD_DIR = "uploads/"
+os.makedirs(UPLOAD_DIR)
 
 @app.route('/upload')
 def display_upload_page():
@@ -13,7 +17,13 @@ def display_upload_page():
 def upload_file():
     if request.method == 'POST':
         f = request.files['file']
-        f.save(secure_filename(f.filename))
+        f.save(UPLOAD_DIR + secure_filename(f.filename))
+
+        # returns SpooledTemporaryFile
+        print("File?" + str(type(f.stream)))
+
+        # pi_eye.classify(f.stream)
+
         return 'file uploaded successfully'
 
 
