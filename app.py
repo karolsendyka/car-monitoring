@@ -1,12 +1,13 @@
 from flask import Flask, render_template, request
 from werkzeug.utils import secure_filename
+from pathlib import Path
 import os
 
 # Fails because path is bad ;/
 import pi_eye
 app = Flask(__name__)
 UPLOAD_DIR = "uploads/"
-os.makedirs(UPLOAD_DIR)
+Path(UPLOAD_DIR).mkdir(parents=True, exist_ok=True)
 
 @app.route('/upload')
 def display_upload_page():
