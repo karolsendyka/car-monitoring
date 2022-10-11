@@ -33,8 +33,7 @@ def register_event():
     app.logger.info('A value for debugging1')
     return {"hello": "world1"}
 
-
-@app.route("/events", methods=['GET'])
-def get_event():
-    app.logger.info('A value for debugging2')
-    return {"hello": "world2"}
+# import os
+@app.route("/load", methods=['GET'])
+def load_input_files():
+    return pi_eye.load_input_files(UPLOAD_DIR)

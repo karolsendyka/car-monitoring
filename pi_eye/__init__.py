@@ -38,3 +38,13 @@ def showPhoto(img):
     if debug:
         plt.imshow(img)
         plt.show()
+
+
+# returns list of files with classifications
+def load_input_files(upload_dir):
+    result = {}
+    list_of_files_to_process = os.listdir(upload_dir)
+    for file in list_of_files_to_process:
+        absolute_path = os.path.abspath(upload_dir + "/" + file)
+        result[file] = classify(absolute_path)
+    return result
