@@ -3,3 +3,4 @@ matplotlib==3.4.3
 numpy==1.21.4
 tensorflow==2.9.1
 Werkzeug==2.0.2
+psycopg2-binary
