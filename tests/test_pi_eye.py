@@ -19,7 +19,7 @@ class PiEyeTests(unittest.TestCase):
         self.assertEqual(pi_eye.classify(self.GOLF_PHOTO), self.CLASS_GOLF)
 
     def test_load_dir(self):
-        self.assertEqual(pi_eye.load_input_files(self.UPLOAD_DIR), {'04-20210108112804-01.jpg', 'srebrny golf'})
+        self.assertEqual(pi_eye.load_input_files(self.UPLOAD_DIR), {'04-20210108112804-01.jpg': 'srebrny golf'})
 
 if __name__ == '__main__':
     unittest.main()
