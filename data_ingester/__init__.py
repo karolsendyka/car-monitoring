@@ -8,7 +8,10 @@ conn = psycopg2.connect(connection_string)
 cur = conn.cursor()
 
 # Execute a query
-cur.execute("SELECT * FROM my_data")
+cur.execute("SELECT * FROM observation")
 
 # Retrieve query results
 records = cur.fetchall()
+
+print(records)
+
