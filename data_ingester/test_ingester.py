@@ -20,8 +20,14 @@ class DataIngesterTests(unittest.TestCase):
     def tearDown(self):
         self.postgresql.stop()
 
-    def assert_empty_database(self):
+    def test_no_results_when_empty_database(self):
         self.assertEqual(data_ingester.list(), [])
+    def test_that_can_retrieve_after_insert(self):
+        data_ingester.insert("class_abc")
+
+        result = data_ingester.list()
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0][1], "class_abc" )
 
 
 def read_file(path):

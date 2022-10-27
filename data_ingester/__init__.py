@@ -14,8 +14,9 @@ def insert(object_class):
     cursor = connection.cursor()
     sql_insert_query = """ INSERT INTO observation (class, observed_on) 
                            VALUES (%s,now()) """
-    record_to_insert = (object_class)
+    record_to_insert = [object_class]
     cursor.execute(sql_insert_query, record_to_insert)
+    connection.commit()
 
 
 def list():
