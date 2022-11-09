@@ -11,12 +11,12 @@ def connect():
     print(f"connecting {connection_string}")
     return psycopg2.connect(connection_string)
 
-def insert(object_class, creation_date):
+def insert(object_class, creation_date, filename):
     connection = connect()
     cursor = connection.cursor()
-    sql_insert_query = """ INSERT INTO observation (class, observed_on) 
-                           VALUES (%s,%s) """
-    cursor.execute(sql_insert_query, (object_class, creation_date))
+    sql_insert_query = """ INSERT INTO observation (class, observed_on, filename) 
+                           VALUES (%s,%s,%s) """
+    cursor.execute(sql_insert_query, (object_class, creation_date, filename))
     connection.commit()
 
 
@@ -40,5 +40,5 @@ def load_input_files(upload_dir):
         class_of_object = pi_eye.classify(absolute_path)
         result[file] = class_of_object
         file_creation_date = os.path.getmtime(absolute_path)
-        insert(class_of_object, datetime.datetime.fromtimestamp(file_creation_date))
+        insert(class_of_object, datetime.datetime.fromtimestamp(file_creation_date), file)
         os.remove(absolute_path)

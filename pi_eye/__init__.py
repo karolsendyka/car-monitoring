@@ -30,7 +30,7 @@ def classify(img_path):
     interpreter.set_tensor(input_details[0]['index'], img_array)
     interpreter.invoke()
     output_data = interpreter.get_tensor(output_details[0]['index'])
-    print(output_data)
+    print(f"{img_path} {output_data}")
     return CLASS_NAMES[np.argmax(output_data)]
 
 

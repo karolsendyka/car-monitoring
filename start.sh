@@ -5,9 +5,7 @@ docker run --name pi-eye-postgres -p 5488:5432 -e POSTGRES_USER=username -e POST
 
 flask run
 
-add nwe module for postgres stuff. or maybe keep in one fiile for now??
-installwd binary !!
+#add nwe module for postgres stuff. or maybe keep in one fiile for now??
+#install  binary !!
 pip install psycopg2-binary
-
-eg:
 
