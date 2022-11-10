@@ -44,3 +44,5 @@ def load_input_files():
     for observation in loaded_data:
         result = result + f"{observation[0]} {str(observation[1])} {str(observation[2])} \n"
     return result
+
+load_input_files()
