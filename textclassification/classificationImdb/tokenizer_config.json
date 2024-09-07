@@ -1,0 +1,1 @@
+{"name": "word_piece_tokenizer", "trainable": true, "dtype": {"module": "keras", "class_name": "DTypePolicy", "config": {"name": "int32"}, "registered_name": null}, "vocabulary": null, "sequence_length": 512, "lowercase": false, "strip_accents": false, "split": true, "suffix_indicator": "##", "oov_token": "[UNK]", "special_tokens": null}

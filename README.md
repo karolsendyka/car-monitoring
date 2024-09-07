@@ -8,3 +8,5 @@ Important directories:
 * /templates directory contains all html templates for flask
 * /uploads contains all uploaded files
 * /test-data/manual data for manual testing
+
+
