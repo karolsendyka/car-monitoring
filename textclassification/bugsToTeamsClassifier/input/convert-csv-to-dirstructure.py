@@ -14,10 +14,10 @@ def csv_to_dirs(csv_name="bugs_to_teams.csv", data_type="train"):
     df.dropna(inplace=True)
     counter = 0
     for index, row in df.iterrows():
-        businessarea = row["team"]
-        Path(f'./data/{data_type}/{businessarea}').mkdir(parents=True, exist_ok=True)
+        team = row["team"]
+        Path(f'./data/{data_type}/{team}').mkdir(parents=True, exist_ok=True)
         counter += 1
-        fileName = f"./data/{data_type}/{businessarea}/{counter}.txt"
+        fileName = f"./data/{data_type}/{team}/{counter}.txt"
         f = open(fileName, "w")
 
         description = row["Description"]
