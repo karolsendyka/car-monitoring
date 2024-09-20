@@ -3,7 +3,11 @@ import keras
 import tensorflow as tf
 import os
 import json
+import pandas as pd
 
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder
 keras.utils.set_random_seed(42)
 
 BATCH_SIZE = 64
@@ -14,25 +18,33 @@ VOCAB_SIZE = 15000
 EMBED_DIM = 128
 INTERMEDIATE_DIM = 512
 
-print(os.listdir("./aclImdb"))
-print(os.listdir("./aclImdb/train"))
-print(os.listdir("./aclImdb/test"))
+# print(os.listdir("./aclImdb"))
+# print(os.listdir("./aclImdb/train"))
+# print(os.listdir("./aclImdb/test"))
+
+# Load your CSV file
+data = pd.read_csv('bugs_to_teams.csv')  # Replace 'your_file.csv' with the actual file path
+
+# Extract the text and labels
+descriptions = data['Description'].values
+labels = data['team'].values
+
 
 train_ds = keras.utils.text_dataset_from_directory(
-    "aclImdb/train",
+    "input/data/train",
     batch_size=BATCH_SIZE,
     validation_split=0.2,
     subset="training",
     seed=42,
 )
 val_ds = keras.utils.text_dataset_from_directory(
-    "aclImdb/train",
+    "input/data/train",
     batch_size=BATCH_SIZE,
     validation_split=0.2,
     subset="validation",
     seed=42,
 )
-test_ds = keras.utils.text_dataset_from_directory("aclImdb/test", batch_size=BATCH_SIZE)
+test_ds = keras.utils.text_dataset_from_directory("input/data/validation", batch_size=BATCH_SIZE)
 
 
 
@@ -42,36 +54,23 @@ train_ds = train_ds.map(lambda x, y: (tf.strings.lower(x), y))
 val_ds = val_ds.map(lambda x, y: (tf.strings.lower(x), y))
 test_ds = test_ds.map(lambda x, y: (tf.strings.lower(x), y))
 #<_MapDataset element_spec=(TensorSpec(shape=(None,), dtype=tf.string, name=None), TensorSpec(shape=(None,), dtype=tf.int32, name=None))>
+# <_MapDataset element_spec=(TensorSpec(shape=(None,), dtype=tf.string, name=None), TensorSpec(shape=(None,), dtype=tf.int32, name=None))>
 #Print samples
 for text_batch, label_batch in train_ds.take(1):
     for i in range(3):
         print(text_batch.numpy()[i])
         print(label_batch.numpy()[i])
-
-
-
+#<_MapDataset element_spec=(TensorSpec(shape=(None,), dtype=tf.string, name=None), TensorSpec(shape=(None,), dtype=tf.int32, name=None))>
 # Tokenize
 def train_word_piece(ds, vocab_size, reserved_tokens):
     word_piece_ds = ds.unbatch().map(lambda x, y: x)
-    print("****")
-    print( isinstance(word_piece_ds, (list, tf.data.Dataset)))
-
-    print(list(word_piece_ds.take(3).as_numpy_iterator()))
-    raise Exception("")
     vocab = keras_nlp.tokenizers.compute_word_piece_vocabulary(
         word_piece_ds.batch(1000).prefetch(2),
         vocabulary_size=vocab_size,
         reserved_tokens=reserved_tokens,
     )
     return vocab
-# word_piece_ds = {_MapDataset} <_MapDataset element_spec=TensorSpec(shape=(), dtype=tf.string, name=None)>
-#  element_spec = {TensorSpec: ()} TensorSpec(shape=(), dtype=tf.string, name=None)
-#   dtype = {DType} tf.string
-#   name = {NoneType} None
-#   shape = {TensorShape: 0} TensorShape([])
-#   value_type = {type} <class 'tensorflow.python.framework.tensor.Tensor'>
 
-# <_MapDataset element_spec=(TensorSpec(shape=(None,), dtype=tf.string, name=None), TensorSpec(shape=(None,), dtype=tf.int32, name=None))>
 
 reserved_tokens = ["[PAD]", "[UNK]"]
 train_sentences = [element[0] for element in train_ds]
