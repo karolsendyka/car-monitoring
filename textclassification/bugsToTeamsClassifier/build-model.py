@@ -1,34 +1,19 @@
-import keras_nlp
-import keras
-import tensorflow as tf
-import os
 import json
-import pandas as pd
 
-import numpy as np
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import LabelEncoder
+import keras
+import keras_nlp
+import pandas as pd
+import tensorflow as tf
+
 keras.utils.set_random_seed(42)
 
-BATCH_SIZE = 64
-EPOCHS = 1
-MAX_SEQUENCE_LENGTH = 512
+BATCH_SIZE = 90
+EPOCHS = 10
+MAX_SEQUENCE_LENGTH = 1024
 VOCAB_SIZE = 15000
 
 EMBED_DIM = 128
 INTERMEDIATE_DIM = 512
-
-# print(os.listdir("./aclImdb"))
-# print(os.listdir("./aclImdb/train"))
-# print(os.listdir("./aclImdb/test"))
-
-# Load your CSV file
-data = pd.read_csv('bugs_to_teams.csv')  # Replace 'your_file.csv' with the actual file path
-
-# Extract the text and labels
-descriptions = data['Description'].values
-labels = data['team'].values
-
 
 train_ds = keras.utils.text_dataset_from_directory(
     "input/data/train",
@@ -45,44 +30,41 @@ val_ds = keras.utils.text_dataset_from_directory(
     seed=42,
 )
 test_ds = keras.utils.text_dataset_from_directory("input/data/validation", batch_size=BATCH_SIZE)
+num_classes = len(train_ds.class_names)
 
-
-
+with open("classnames.json", "w") as f:
+    json.dump(train_ds.class_names, f)
 
 # to lower case
 train_ds = train_ds.map(lambda x, y: (tf.strings.lower(x), y))
 val_ds = val_ds.map(lambda x, y: (tf.strings.lower(x), y))
 test_ds = test_ds.map(lambda x, y: (tf.strings.lower(x), y))
-#<_MapDataset element_spec=(TensorSpec(shape=(None,), dtype=tf.string, name=None), TensorSpec(shape=(None,), dtype=tf.int32, name=None))>
-# <_MapDataset element_spec=(TensorSpec(shape=(None,), dtype=tf.string, name=None), TensorSpec(shape=(None,), dtype=tf.int32, name=None))>
+
+
 #Print samples
 for text_batch, label_batch in train_ds.take(1):
     for i in range(3):
         print(text_batch.numpy()[i])
         print(label_batch.numpy()[i])
-#<_MapDataset element_spec=(TensorSpec(shape=(None,), dtype=tf.string, name=None), TensorSpec(shape=(None,), dtype=tf.int32, name=None))>
+
 # Tokenize
 def train_word_piece(ds, vocab_size, reserved_tokens):
     word_piece_ds = ds.unbatch().map(lambda x, y: x)
     vocab = keras_nlp.tokenizers.compute_word_piece_vocabulary(
-        word_piece_ds.batch(1000).prefetch(2),
+        word_piece_ds.batch(10).prefetch(2),
         vocabulary_size=vocab_size,
         reserved_tokens=reserved_tokens,
     )
     return vocab
 
-
 reserved_tokens = ["[PAD]", "[UNK]"]
-train_sentences = [element[0] for element in train_ds]
 vocab = train_word_piece(train_ds, VOCAB_SIZE, reserved_tokens)
 
 #store vocab
 with open("vocab.json", "w") as f:
     f.write(json.dumps(vocab))
 
-
 print("Tokens: ", vocab[10:20])
-
 
 #Define tokenizer
 tokenizer = keras_nlp.tokenizers.WordPieceTokenizer(
@@ -119,8 +101,6 @@ train_ds = make_dataset(train_ds)
 val_ds = make_dataset(val_ds)
 test_ds = make_dataset(test_ds)
 
-
-
 #Build the model
 input_ids = keras.Input(shape=(None,), dtype="int64", name="input_ids")
 
@@ -130,30 +110,25 @@ x = keras_nlp.layers.TokenAndPositionEmbedding(
     embedding_dim=EMBED_DIM,
     mask_zero=True,
 )(input_ids)
-#
-# x = keras_nlp.layers.FNetEncoder(intermediate_dim=INTERMEDIATE_DIM)(inputs=x)
-# x = keras_nlp.layers.FNetEncoder(intermediate_dim=INTERMEDIATE_DIM)(inputs=x)
-# x = keras_nlp.layers.FNetEncoder(intermediate_dim=INTERMEDIATE_DIM)(inputs=x)
-#
-#
-# x = keras.layers.GlobalAveragePooling1D()(x)
-# x = keras.layers.Dropout(0.1)(x)
-# outputs = keras.layers.Dense(1, activation="sigmoid")(x)
-#
-# fnet_classifier = keras.Model(input_ids, outputs, name="fnet_classifier")
-# # train the model
-#
-# fnet_classifier.summary()
-# fnet_classifier.compile(
-#     optimizer=keras.optimizers.Adam(learning_rate=0.001),
-#     loss="binary_crossentropy",
-#     metrics=["accuracy"],
-# )
-# fnet_classifier.fit(train_ds, epochs=EPOCHS, validation_data=val_ds)
-#
-# fnet_classifier.save("model.keras")
 
+x = keras_nlp.layers.FNetEncoder(intermediate_dim=INTERMEDIATE_DIM)(inputs=x)
+x = keras_nlp.layers.FNetEncoder(intermediate_dim=INTERMEDIATE_DIM)(inputs=x)
+x = keras_nlp.layers.FNetEncoder(intermediate_dim=INTERMEDIATE_DIM)(inputs=x)
+
+
+x = keras.layers.GlobalAveragePooling1D()(x)
+x = keras.layers.Dropout(0.1)(x)
+outputs =keras.layers.Dense(num_classes, activation="softmax")(x)
+
+fnet_classifier = keras.Model(input_ids, outputs, name="fnet_classifier")
+fnet_classifier.summary()
+fnet_classifier.compile(
+    optimizer=keras.optimizers.Adam(learning_rate=0.001),
+    loss="sparse_categorical_crossentropy",
+    metrics=["accuracy"],
+)
+fnet_classifier.fit(train_ds, epochs=EPOCHS, validation_data=val_ds)
+fnet_classifier.save("model.keras")
 
 # calculate accuracy
 fnet_classifier.evaluate(test_ds, batch_size=BATCH_SIZE)
-
