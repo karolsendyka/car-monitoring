@@ -2,32 +2,34 @@ import json
 
 import keras
 import keras_nlp
-import pandas as pd
 import tensorflow as tf
 
-keras.utils.set_random_seed(42)
+from normalization import normalizeText
+# tokenizer test
+# tf.Tensor([147 146 127 ...   0   0   0], shape=(1024,), dtype=int32)
+keras.utils.set_random_seed(17)
 
-BATCH_SIZE = 90
-EPOCHS = 10
-MAX_SEQUENCE_LENGTH = 1024
-VOCAB_SIZE = 15000
+BATCH_SIZE = 32
+EPOCHS = 50
+MAX_SEQUENCE_LENGTH = 256
+VOCAB_SIZE = 10000
 
 EMBED_DIM = 128
-INTERMEDIATE_DIM = 512
+INTERMEDIATE_DIM = 1024
 
 train_ds = keras.utils.text_dataset_from_directory(
     "input/data/train",
     batch_size=BATCH_SIZE,
-    validation_split=0.2,
+    validation_split=0.3,
     subset="training",
-    seed=42,
+    seed=17,
 )
 val_ds = keras.utils.text_dataset_from_directory(
     "input/data/train",
     batch_size=BATCH_SIZE,
-    validation_split=0.2,
+    validation_split=0.3,
     subset="validation",
-    seed=42,
+    seed=17,
 )
 test_ds = keras.utils.text_dataset_from_directory("input/data/validation", batch_size=BATCH_SIZE)
 num_classes = len(train_ds.class_names)
@@ -36,14 +38,14 @@ with open("classnames.json", "w") as f:
     json.dump(train_ds.class_names, f)
 
 # to lower case
-train_ds = train_ds.map(lambda x, y: (tf.strings.lower(x), y))
-val_ds = val_ds.map(lambda x, y: (tf.strings.lower(x), y))
-test_ds = test_ds.map(lambda x, y: (tf.strings.lower(x), y))
+train_ds = normalizeText(train_ds)
+val_ds = normalizeText(val_ds)
+test_ds = normalizeText(test_ds)
 
 
 #Print samples
 for text_batch, label_batch in train_ds.take(1):
-    for i in range(3):
+    for i in range(1):
         print(text_batch.numpy()[i])
         print(label_batch.numpy()[i])
 
@@ -72,6 +74,8 @@ tokenizer = keras_nlp.tokenizers.WordPieceTokenizer(
     lowercase=False,
     sequence_length=MAX_SEQUENCE_LENGTH,
 )
+print("tokenizer test")
+print(tokenizer("what it is"))
 
 # Save the tokenizer configuration
 tokenizer_config = tokenizer.get_config()
@@ -108,26 +112,34 @@ x = keras_nlp.layers.TokenAndPositionEmbedding(
     vocabulary_size=VOCAB_SIZE,
     sequence_length=MAX_SEQUENCE_LENGTH,
     embedding_dim=EMBED_DIM,
-    mask_zero=True,
+    mask_zero=False,
 )(input_ids)
 
+l2_reg = keras.regularizers.L2(0.03)  # You can tune this value
+
 x = keras_nlp.layers.FNetEncoder(intermediate_dim=INTERMEDIATE_DIM)(inputs=x)
-x = keras_nlp.layers.FNetEncoder(intermediate_dim=INTERMEDIATE_DIM)(inputs=x)
-x = keras_nlp.layers.FNetEncoder(intermediate_dim=INTERMEDIATE_DIM)(inputs=x)
+# x = keras_nlp.layers.FNetEncoder(intermediate_dim=INTERMEDIATE_DIM)(inputs=x)
+# x = keras_nlp.layers.FNetEncoder(intermediate_dim=INTERMEDIATE_DIM)(inputs=x)
 
 
 x = keras.layers.GlobalAveragePooling1D()(x)
-x = keras.layers.Dropout(0.1)(x)
-outputs =keras.layers.Dense(num_classes, activation="softmax")(x)
+x = keras.layers.Dropout(0.4)(x)
+outputs =keras.layers.Dense(num_classes, activation="softmax", kernel_regularizer=l2_reg)(x)
 
 fnet_classifier = keras.Model(input_ids, outputs, name="fnet_classifier")
 fnet_classifier.summary()
 fnet_classifier.compile(
-    optimizer=keras.optimizers.Adam(learning_rate=0.001),
+    optimizer=keras.optimizers.Adam(learning_rate=0.0005),
     loss="sparse_categorical_crossentropy",
     metrics=["accuracy"],
 )
-fnet_classifier.fit(train_ds, epochs=EPOCHS, validation_data=val_ds)
+
+early_stopping = keras.callbacks.EarlyStopping(
+    monitor="val_loss",
+    patience=5,  # Number of epochs to wait for improvement
+    restore_best_weights=True,
+)
+fnet_classifier.fit(train_ds, epochs=EPOCHS, validation_data=val_ds, callbacks=[early_stopping])
 fnet_classifier.save("model.keras")
 
 # calculate accuracy
