@@ -22,7 +22,7 @@ def csv_to_dirs(csv_name="bugs_to_teams.csv", data_type="train"):
 
         description = row["Description"]
         summary = row["Summary"]
-        text = '\n' + description
+        text = summary
         f.write(text)
         f.close()
 

@@ -1,11 +1,10 @@
 import tensorflow as tf
 import keras_nlp
-import keras
 import json
-import sys
 import numpy as np
+from normalization import normalizeSingleText
 
-MAX_SEQUENCE_LENGTH = 512
+MAX_SEQUENCE_LENGTH = 40
 
 def load_model(model_path):
     # Load the FNet model from the saved file
@@ -13,15 +12,7 @@ def load_model(model_path):
     return model
 
 
-def load_tokenizer(config_path):
-    # # Load the tokenizer configuration
-    # with open(config_path, 'r') as f:
-    #     tokenizer_config = json.load(f)
-    #
-    # # Reconstruct the tokenizer from the configuration
-    # tokenizer = keras_nlp.tokenizers.WordPieceTokenizer.from_config(tokenizer_config)
-    # return tokenizer
-
+def load_tokenizer():
     with open("./vocab.json", 'r') as f:
         vocab = json.load(f)
 
@@ -40,25 +31,19 @@ def preprocess_text(text, tokenizer, seq_length=128):
     print(tokenized_input)
     token_ids = tokenized_input
 
-    # token_ids = tokenized_input["token_ids"]
-    # print("token_ids")
-    # print(token_ids)
-
     # Ensure the token_ids are padded or truncated to the desired sequence length
     if len(token_ids) > seq_length:
         token_ids = token_ids[:seq_length]
     else:
         token_ids = np.pad(token_ids, (0, seq_length - len(token_ids)), 'constant', constant_values=0)
-
     return np.array([token_ids])
 
 
 def classify_text(model, tokenizer, text):
     # Preprocess the input text
+    normalizeSingleText(text)
     processed_input = preprocess_text(text, tokenizer)
     print(processed_input)
-    # Classify the input
-    # prediction = model.predict(processed_input)
     y_prob = model.predict(processed_input)
     y_classes = y_prob.argmax(axis=-1)
     with open('classnames.json', 'r') as file:
@@ -67,25 +52,15 @@ def classify_text(model, tokenizer, text):
     print(data[y_classes[0]])
     return data[y_classes[0]]
 
+model_path = "model.keras"
+config_path = "tokenizer_config.json"
+model = load_model(model_path)
+# Load the tokenizer configuration and reconstruct the tokenizer
+tokenizer = load_tokenizer(config_path)
 
-if __name__ == "__main__":
-    if len(sys.argv) != 4:
-        print("Usage: python classify.py <model_path> <tokenizer_config_path> <text_to_classify>")
-        sys.exit(1)
+# Classify the text
+with open('input.txt', 'r') as file:
+    input_text = file.read()
 
-    model_path = sys.argv[1]
-    config_path = sys.argv[2]
-    input_text = sys.argv[3]
-
-    # Load the model
-    model = load_model(model_path)
-    print(type(model))
-    print(model)
-
-    # Load the tokenizer configuration and reconstruct the tokenizer
-    tokenizer = load_tokenizer(config_path)
-
-    # Classify the text
-    result = classify_text(model, tokenizer, input_text)
-
-    print(f"Classification: {result}")
+result = classify_text(model, tokenizer, input_text)
+print(f"Classification: {result}")
