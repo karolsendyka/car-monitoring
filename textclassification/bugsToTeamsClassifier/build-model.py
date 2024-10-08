@@ -9,7 +9,7 @@ import pandas as pd
 from normalization import normalizeText
 
 keras.utils.set_random_seed(17)
-BATCH_SIZE = 32
+BATCH_SIZE = 16
 EPOCHS = 50
 MAX_SEQUENCE_LENGTH = 40
 VOCAB_SIZE = 2000
@@ -180,13 +180,12 @@ def plot_and_save_history(history, filename='training_history.png'):
 plot_and_save_history(history.history, 'training_history.png')
 
 # COMMITED
-# 21/21 ━━━━━━━━━━━━━━━━━━━━ 1s 54ms/step - accuracy: 0.8508 - loss: 0.6315 - val_accuracy: 0.4752 - val_loss: 2.3185
-# 2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 18ms/step - accuracy: 0.1215 - loss: 4.9433
+# 42/42 ━━━━━━━━━━━━━━━━━━━━ 2s 37ms/step - accuracy: 0.8670 - loss: 0.5292 - val_accuracy: 0.5461 - val_loss: 2.4518
+# 3/3 ━━━━━━━━━━━━━━━━━━━━ 0s 10ms/step - accuracy: 0.0743 - loss: 5.7053
 
 
 # LAST
-# 21/21 ━━━━━━━━━━━━━━━━━━━━ 1s 53ms/step - accuracy: 0.6123 - loss: 1.5064 - val_accuracy: 0.4043 - val_loss: 2.4743
-# 2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 18ms/step - accuracy: 0.0284 - loss: 4.9400
+
 
 
 # NEXT
