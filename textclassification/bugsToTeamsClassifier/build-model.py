@@ -3,6 +3,8 @@ import json
 import keras
 import keras_nlp
 import tensorflow as tf
+import matplotlib.pyplot as plt
+import pandas as pd
 
 from normalization import normalizeText
 
@@ -138,7 +140,41 @@ early_stopping = keras.callbacks.EarlyStopping(
 )
 
 # Fit the model
-classifier.fit(train_ds, epochs=EPOCHS, validation_data=val_ds, callbacks=[early_stopping])
+
+history = classifier.fit(train_ds, epochs=EPOCHS, validation_data=val_ds, callbacks=[early_stopping])
+history_df = pd.DataFrame(history.history)
+history_df.to_csv('training_history.csv', index=False)
+
 classifier.save("model.keras")
-print("Evaluate\n")
+
+# calculate accuracy
 classifier.evaluate(test_ds, batch_size=BATCH_SIZE)
+
+def plot_and_save_history(history, filename='training_history.png'):
+    # Accuracy plot
+    plt.figure(figsize=(12, 5))
+
+    # Subplot 1: Accuracy
+    plt.subplot(1, 2, 1)
+    plt.plot(history['accuracy'], label='Train Accuracy')
+    plt.plot(history['val_accuracy'], label='Validation Accuracy')
+    plt.title('Model Accuracy')
+    plt.ylabel('Accuracy')
+    plt.xlabel('Epoch')
+    plt.legend(loc='upper left')
+
+    # Subplot 2: Loss
+    plt.subplot(1, 2, 2)
+    plt.plot(history['loss'], label='Train Loss')
+    plt.plot(history['val_loss'], label='Validation Loss')
+    plt.title('Model Loss')
+    plt.ylabel('Loss')
+    plt.xlabel('Epoch')
+    plt.legend(loc='upper right')
+
+    # Save plot as PNG file
+    plt.tight_layout()
+    plt.savefig(filename)
+    plt.show()
+
+plot_and_save_history(history.history, 'training_history.png')
