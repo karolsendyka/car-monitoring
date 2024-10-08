@@ -175,6 +175,21 @@ def plot_and_save_history(history, filename='training_history.png'):
     # Save plot as PNG file
     plt.tight_layout()
     plt.savefig(filename)
-    plt.show()
+    # plt.show()
 
 plot_and_save_history(history.history, 'training_history.png')
+
+# COMMITED
+# 21/21 ━━━━━━━━━━━━━━━━━━━━ 1s 54ms/step - accuracy: 0.8508 - loss: 0.6315 - val_accuracy: 0.4752 - val_loss: 2.3185
+# 2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 18ms/step - accuracy: 0.1215 - loss: 4.9433
+
+
+# LAST
+# 21/21 ━━━━━━━━━━━━━━━━━━━━ 1s 53ms/step - accuracy: 0.6123 - loss: 1.5064 - val_accuracy: 0.4043 - val_loss: 2.4743
+# 2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 18ms/step - accuracy: 0.0284 - loss: 4.9400
+
+
+# NEXT
+# EXPERIMENT WITH BATCH SIZES
+# DATA AUGUMENTATION
+# Tune the number of units in the LSTM layer or consider adding more LSTM layers (with smaller units) for deeper feature extraction.
