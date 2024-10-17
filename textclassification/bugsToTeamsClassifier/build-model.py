@@ -181,11 +181,9 @@ def plot_and_save_history(history, filename='training_history.png'):
 plot_and_save_history(history.history, 'training_history.png')
 
 # COMMITED
-# Epoch 10/50
-# 52/52 ━━━━━━━━━━━━━━━━━━━━ 2s 35ms/step - accuracy: 0.7328 - loss: 0.9707 - val_accuracy: 0.4958 - val_loss: 2.3446
-# Epoch 11/50
-# 52/52 ━━━━━━━━━━━━━━━━━━━━ 2s 36ms/step - accuracy: 0.7692 - loss: 0.8431 - val_accuracy: 0.4930 - val_loss: 2.3251
-# 9/9 ━━━━━━━━━━━━━━━━━━━━ 0s 9ms/step - accuracy: 0.0868 - loss: 4.7445
+# Epoch 17/50
+# 94/94 ━━━━━━━━━━━━━━━━━━━━ 3s 36ms/step - accuracy: 0.9943 - loss: 0.0529 - val_accuracy: 0.8087 - val_loss: 1.1702
+# 17/17 ━━━━━━━━━━━━━━━━━━━━ 0s 9ms/step - accuracy: 0.1650 - loss: 7.5960
 
 
 # LAST
