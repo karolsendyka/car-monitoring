@@ -8,13 +8,14 @@ def split_csv(input_file):
     # Read the input CSV file
     data = pd.read_csv(input_file)
 
-    # data[data['team'] != "Product"]
-    # data[data['team'] != "not set"]
-    # data[data['team'] != "AngularJS SWAT Team"]
-    # data[data['team'] != "Designers"]
+    data = data[data['team'] != "Product"]
+    data = data[data['team'] != "not set"]
+    data = data[data['team'] != "AngularJS SWAT Team"]
+    data = data[data['team'] != "Designers"]
 
     print("Number of examples per class:")
     print(data['team'].value_counts())
+    print(data['team'].nunique())
 
 
     # Split the data into 90% training and 10% test
