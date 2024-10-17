@@ -56,7 +56,7 @@ model_path = "model.keras"
 config_path = "tokenizer_config.json"
 model = load_model(model_path)
 # Load the tokenizer configuration and reconstruct the tokenizer
-tokenizer = load_tokenizer(config_path)
+tokenizer = load_tokenizer()
 
 # Classify the text
 with open('input.txt', 'r') as file:

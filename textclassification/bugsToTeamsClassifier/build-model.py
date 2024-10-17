@@ -69,6 +69,7 @@ tokenizer = keras_nlp.tokenizers.WordPieceTokenizer(
     lowercase=False,
     sequence_length=MAX_SEQUENCE_LENGTH,
 )
+print(tokenizer("what it is"))
 
 # Save the tokenizer configuration
 tokenizer_config = tokenizer.get_config()

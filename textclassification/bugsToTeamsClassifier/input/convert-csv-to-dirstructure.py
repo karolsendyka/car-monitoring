@@ -7,8 +7,15 @@ from sklearn.model_selection import train_test_split
 def split_csv(input_file):
     # Read the input CSV file
     data = pd.read_csv(input_file)
+
+    # data[data['team'] != "Product"]
+    # data[data['team'] != "not set"]
+    # data[data['team'] != "AngularJS SWAT Team"]
+    # data[data['team'] != "Designers"]
+
     print("Number of examples per class:")
     print(data['team'].value_counts())
+
 
     # Split the data into 90% training and 10% test
     train_data, test_data = train_test_split(data, test_size=0.1, random_state=42, shuffle=True)
